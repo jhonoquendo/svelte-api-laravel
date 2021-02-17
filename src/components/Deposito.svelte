@@ -8,6 +8,7 @@
     let nombre='';
     let cantidad='';
     let error = false;
+    let disabled = false;
 
     const validar = () => {
         if(nombre.trim() === '' || cantidad <= 0 ){
@@ -24,26 +25,30 @@
         error = false;
     }
     
-
     const ejecutar = async (e) => {
         e.preventDefault();
         validar();
         if(error == false){
-            cantidad = parseInt(cantidad);
-            let data = new FormData();
-            data.append('type',proceso);
-            data.append('name',nombre);
-            data.append('destination','0');
-            data.append('amount',cantidad);
-            await fetch(`${urlBase}event`,{
-                method:'POST',
-                body: data
-            })
-            .then((res) => res.json())
-                .then((res) => {
-                    limpiar();
-                    dispatch('ejecutar');
-                });
+            disabled = true;
+            setTimeout( async ()=>{
+                cantidad = parseInt(cantidad);
+                let data = new FormData();
+                data.append('type',proceso);
+                data.append('name',nombre);
+                data.append('destination','0');
+                data.append('amount',cantidad);
+                await fetch(`${urlBase}event`,{
+                    method:'POST',
+                    body: data
+                })
+                .then((res) => res.json())
+                    .then((res) => {
+                        limpiar();
+                        dispatch('ejecutar');
+                    });
+                disabled = false;
+            },1000);
+            
         }
     }
 </script>
@@ -78,5 +83,6 @@
         type="submit"
         class="button-primary u-full-width"
         value="Agregar {proceso}"
+        disabled = {disabled}
         />
 </form>
